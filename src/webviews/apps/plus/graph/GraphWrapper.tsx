@@ -3,6 +3,7 @@ import type {
 	GraphColumnSetting,
 	GraphContainerProps,
 	GraphPlatform,
+    GraphRef,
 	GraphRow,
 	OnFormatCommitDateTime,
 } from '@gitkraken/gitkraken-components';
@@ -464,6 +465,28 @@ export function GraphWrapper({
 		}
 	};
 
+	const handleOnHiddenRefsContextMenu = (event: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
+		console.log('*** handleOnHiddenRefsContextMenu -> ', event);
+
+		// TODO: discuss if we can use the VSCode context menu and if we need to include
+		// a specific context in the button of graph component side.
+
+		// const e = event.nativeEvent;
+		// const evt = new MouseEvent('contextmenu', {
+		// 	bubbles: true,
+		// 	clientX: e.clientX,
+		// 	clientY: e.clientY,
+		// });
+		// e.target?.dispatchEvent(evt);
+		// e.stopImmediatePropagation();
+	};
+
+	const handleOnToggleRefVisibilityClick = (event: any, ref: GraphRef, refVisible: boolean, graphRow: GraphRow) => {
+		console.log('*** handleOnToggleRefVisibilityClick -> ', event, ref, refVisible, graphRow);
+
+		// TODO: should modify the graphConfig?.hiddenRefsById object
+	};
+
 	const handleSelectGraphRows = (rows: GraphRow[]) => {
 		const active = rows[0];
 		const activeKey = active != null ? `${active.sha}|${active.date}` : undefined;
@@ -471,7 +494,7 @@ export function GraphWrapper({
 		state.activeRow = activeKey;
 		setActiveRow(activeKey);
 		onSelectionChange?.(rows);
-	};
+    };
 
 	const handleDismissPreview = () => {
 		setShowPreview(false);
@@ -683,12 +706,15 @@ export function GraphWrapper({
 								// Just cast the { [id: string]: number } object to { [id: string]: boolean } for performance
 								highlightedShas={searchResults?.ids as GraphContainerProps['highlightedShas']}
 								highlightRowsOnRefHover={graphConfig?.highlightRowsOnRefHover}
+								// hiddenRefsById={graphConfig?.hiddenRefsById} // TODO: add this new property to graphConfig object
 								showGhostRefsOnRowHover={graphConfig?.showGhostRefsOnRowHover}
 								isLoadingRows={isLoading}
 								isSelectedBySha={selectedRows}
 								nonce={nonce}
 								onColumnResized={handleOnColumnResized}
+								onHiddenRefsContextMenu={handleOnHiddenRefsContextMenu}
 								onSelectGraphRows={handleSelectGraphRows}
+								onToggleRefVisibilityClick={handleOnToggleRefVisibilityClick}
 								onEmailsMissingAvatarUrls={handleMissingAvatars}
 								onShowMoreCommits={handleMoreCommits}
 								platform={clientPlatform}
