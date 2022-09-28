@@ -5,6 +5,7 @@ import type {
 	GraphPlatform,
     GraphRef,
 	GraphRow,
+    HiddenRefsById,
 	OnFormatCommitDateTime,
 } from '@gitkraken/gitkraken-components';
 import type { ReactElement } from 'react';
@@ -20,6 +21,7 @@ import type {
 	GraphColumnConfig,
 	GraphColumnName,
 	GraphComponentConfig,
+	GraphHiddenRef,
 	GraphRepository,
 	GraphSearchResults,
 	GraphSearchResultsError,
@@ -54,6 +56,7 @@ export interface GraphWrapperProps {
 	onColumnChange?: (name: GraphColumnName, settings: GraphColumnConfig) => void;
 	onMissingAvatars?: (emails: { [email: string]: string }) => void;
 	onMoreRows?: (id?: string) => void;
+    onHiddenRefChange?: (ref: GraphRef, visible: boolean) => void;
 	onSearch?: (search: SearchQuery | undefined, options?: { limit?: number }) => void;
 	onSearchPromise?: (
 		search: SearchQuery,
@@ -64,6 +67,20 @@ export interface GraphWrapperProps {
 	onSelectionChange?: (rows: GraphRow[]) => void;
 	onEnsureRowPromise?: (id: string, select: boolean) => Promise<DidEnsureRowParams | undefined>;
 }
+const getHiddenRefsById = (
+	hiddenRefs?: Record<string, GraphHiddenRef>
+): HiddenRefsById | undefined => {
+	if (hiddenRefs == null) return undefined;
+
+	const hiddenRefsById: HiddenRefsById = {};
+	if (hiddenRefs != null) {
+		for (const [refId] of Object.entries(hiddenRefs)) {
+			hiddenRefsById[refId] = true;
+		}
+	}
+
+	return hiddenRefsById;
+};
 
 const getGraphDateFormatter = (config?: GraphComponentConfig): OnFormatCommitDateTime => {
 	return (commitDateTime: number) => formatCommitDateTime(commitDateTime, config?.dateStyle, config?.dateFormat);
@@ -136,6 +153,7 @@ export function GraphWrapper({
 	onEnsureRowPromise,
 	onMissingAvatars,
 	onMoreRows,
+    onHiddenRefChange,
 	onSearch,
 	onSearchPromise,
 	onSearchOpenInView,
@@ -481,10 +499,8 @@ export function GraphWrapper({
 		// e.stopImmediatePropagation();
 	};
 
-	const handleOnToggleRefVisibilityClick = (event: any, ref: GraphRef, refVisible: boolean, graphRow: GraphRow) => {
-		console.log('*** handleOnToggleRefVisibilityClick -> ', event, ref, refVisible, graphRow);
-
-		// TODO: should modify the graphConfig?.hiddenRefsById object
+	const handleOnToggleRefVisibilityClick = (event: any, ref: GraphRef, refVisible: boolean) => {
+		onHiddenRefChange?.(ref, refVisible);
 	};
 
 	const handleSelectGraphRows = (rows: GraphRow[]) => {
@@ -706,7 +722,7 @@ export function GraphWrapper({
 								// Just cast the { [id: string]: number } object to { [id: string]: boolean } for performance
 								highlightedShas={searchResults?.ids as GraphContainerProps['highlightedShas']}
 								highlightRowsOnRefHover={graphConfig?.highlightRowsOnRefHover}
-								// hiddenRefsById={graphConfig?.hiddenRefsById} // TODO: add this new property to graphConfig object
+								hiddenRefsById={hiddenRefsById}
 								showGhostRefsOnRowHover={graphConfig?.showGhostRefsOnRowHover}
 								isLoadingRows={isLoading}
 								isSelectedBySha={selectedRows}

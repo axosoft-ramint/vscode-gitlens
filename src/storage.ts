@@ -164,6 +164,7 @@ export interface WorkspaceStorage {
 			dismissed?: Record<string, boolean>;
 		};
 		columns?: Record<string, StoredGraphColumn>;
+		hiddenRefs?: Record<string, StoredGraphHiddenRef>;
 	};
 	remote: {
 		default?: string;
@@ -215,6 +216,10 @@ export interface StoredBranchComparisons {
 export interface StoredGraphColumn {
 	isHidden?: boolean;
 	width?: number;
+}
+
+export interface StoredGraphHiddenRef {
+	name: string;
 }
 
 export interface StoredNamedRef {

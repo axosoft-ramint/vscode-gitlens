@@ -1,5 +1,5 @@
 /*global document window*/
-import type { CssVariables, GraphRow } from '@gitkraken/gitkraken-components';
+import type { CssVariables, GraphRef, GraphRow } from '@gitkraken/gitkraken-components';
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import type { GitGraphRowType } from '../../../../git/models/graph';
@@ -11,12 +11,12 @@ import type {
 	GraphRepository,
 	InternalNotificationType,
 	State,
-	UpdateStateCallback,
-} from '../../../../plus/webviews/graph/protocol';
+	UpdateStateCallback} from '../../../../plus/webviews/graph/protocol';
 import {
 	DidChangeAvatarsNotificationType,
 	DidChangeColumnsNotificationType,
 	DidChangeGraphConfigurationNotificationType,
+	DidChangeHiddenRefsNotificationType,
 	DidChangeNotificationType,
 	DidChangeRowsNotificationType,
 	DidChangeSelectionNotificationType,
@@ -31,6 +31,7 @@ import {
 	SearchCommandType,
 	SearchOpenInViewCommandType,
 	UpdateColumnCommandType,
+	UpdateHiddenRefCommandType,
 	UpdateSelectedRepositoryCommandType as UpdateRepositorySelectionCommandType,
 	UpdateSelectionCommandType,
 } from '../../../../plus/webviews/graph/protocol';
@@ -78,6 +79,10 @@ export class GraphApp extends App<State> {
 					subscriber={(callback: UpdateStateCallback) => this.registerEvents(callback)}
 					onColumnChange={debounce<GraphApp['onColumnChanged']>(
 						(name, settings) => this.onColumnChanged(name, settings),
+						250,
+					)}
+                    onHiddenRefChange={debounce<GraphApp['onHiddenRefChanged'](
+						(ref: GraphRef, visible: boolean) => this.onHiddenRefChanged(ref, visible),
 						250,
 					)}
 					onSelectRepository={debounce<GraphApp['onRepositorySelectionChanged']>(
@@ -138,6 +143,13 @@ export class GraphApp extends App<State> {
 					}
 
 					this.setState(this.state, type);
+				});
+				break;
+
+            case DidChangeHiddenRefsNotificationType.method:
+				onIpc(DidChangeHiddenRefsNotificationType, msg, (params, type) => {
+					const newState = { ...this.state, hiddenRefs: params.hiddenRefs };
+					this.setState(newState, type);
 				});
 				break;
 
@@ -335,6 +347,14 @@ export class GraphApp extends App<State> {
 		this.sendCommand(UpdateColumnCommandType, {
 			name: name,
 			config: settings,
+		});
+	}
+
+	private onHiddenRefChanged(ref: GraphRef, visible: boolean) {
+		this.sendCommand(UpdateHiddenRefCommandType, {
+			id: (ref as any).id,
+			name: (ref as any).name,
+			visible: visible,
 		});
 	}
 
