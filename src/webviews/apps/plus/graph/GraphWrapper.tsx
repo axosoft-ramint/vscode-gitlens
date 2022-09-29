@@ -483,22 +483,6 @@ export function GraphWrapper({
 		}
 	};
 
-	const handleOnHiddenRefsClick = (event: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
-		console.log('*** handleOnHiddenRefsClick -> ', event);
-
-		// TODO: discuss if we can use the VSCode context menu and if we need to include
-		// a specific context in the button of graph component side.
-
-		// const e = event.nativeEvent;
-		// const evt = new MouseEvent('contextmenu', {
-		// 	bubbles: true,
-		// 	clientX: e.clientX,
-		// 	clientY: e.clientY,
-		// });
-		// e.target?.dispatchEvent(evt);
-		// e.stopImmediatePropagation();
-	};
-
 	const handleOnToggleRefVisibilityClick = (event: any, ref: GraphRef, refVisible: boolean) => {
 		onHiddenRefChange?.(ref, refVisible);
 	};
@@ -728,7 +712,6 @@ export function GraphWrapper({
 								isSelectedBySha={selectedRows}
 								nonce={nonce}
 								onColumnResized={handleOnColumnResized}
-								onHiddenRefsClick={handleOnHiddenRefsClick}
 								onSelectGraphRows={handleSelectGraphRows}
 								onToggleRefVisibilityClick={handleOnToggleRefVisibilityClick}
 								onEmailsMissingAvatarUrls={handleMissingAvatars}
