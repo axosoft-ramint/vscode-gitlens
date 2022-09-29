@@ -4,6 +4,7 @@ import type {
 	GraphContexts,
 	GraphRow,
 	GraphZoneType,
+	HiddenRefsById,
 	Remote,
 	WorkDirStats,
 } from '@gitkraken/gitkraken-components';
@@ -38,7 +39,7 @@ export interface State {
 	trialBanner?: boolean;
 	workingTreeStats?: GraphWorkingTreeStats;
 	searchResults?: DidSearchParams['results'];
-	hiddenRefs?: Record<string, GraphHiddenRef>;
+	hiddenRefs?: HiddenRefsById;
 
 	// Props below are computed in the webview (not passed)
 	activeRow?: string;
@@ -94,6 +95,7 @@ export interface GraphColumnConfig {
 }
 
 export interface GraphHiddenRef {
+	id: string;
 	name: string;
 }
 
@@ -146,8 +148,7 @@ export interface UpdateColumnParams {
 export const UpdateColumnCommandType = new IpcCommandType<UpdateColumnParams>('graph/update/column');
 
 export interface UpdateHiddenRefParams {
-	id: string;
-	name: string;
+	ref: GraphHiddenRef;
 	visible: boolean;
 }
 export const UpdateHiddenRefCommandType = new IpcCommandType<UpdateHiddenRefParams>('graph/update/hiddenRef');

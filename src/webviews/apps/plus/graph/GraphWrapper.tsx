@@ -4,6 +4,7 @@ import type {
 	GraphContainerProps,
 	GraphPlatform,
     GraphRef,
+    GraphRefOptData,
 	GraphRow,
     HiddenRefsById,
 	OnFormatCommitDateTime,
@@ -56,7 +57,7 @@ export interface GraphWrapperProps {
 	onColumnChange?: (name: GraphColumnName, settings: GraphColumnConfig) => void;
 	onMissingAvatars?: (emails: { [email: string]: string }) => void;
 	onMoreRows?: (id?: string) => void;
-    onHiddenRefChange?: (ref: GraphRef, visible: boolean) => void;
+    onHiddenRefChange?: (ref: GraphHiddenRef, visible: boolean) => void;
 	onSearch?: (search: SearchQuery | undefined, options?: { limit?: number }) => void;
 	onSearchPromise?: (
 		search: SearchQuery,
@@ -483,7 +484,7 @@ export function GraphWrapper({
 		}
 	};
 
-	const handleOnToggleRefVisibilityClick = (event: any, ref: GraphRef, refVisible: boolean) => {
+	const handleOnToggleRefVisibilityClick = (event: any, ref: GraphRefOptData, refVisible: boolean) => {
 		onHiddenRefChange?.(ref, refVisible);
 	};
 

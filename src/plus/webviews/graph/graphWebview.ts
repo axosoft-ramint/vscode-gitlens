@@ -1,3 +1,4 @@
+import type { HiddenRefsById } from '@gitkraken/gitkraken-components';
 import type {
 	ColorTheme,
 	ConfigurationChangeEvent,
@@ -496,7 +497,7 @@ export class GraphWebview extends WebviewBase<State> {
 	}
 
 	private onHiddenRefUpdated(e: UpdateHiddenRefParams) {
-		this.updateHiddenRef(e.id, e.name, e.visible);
+		this.updateHiddenRef(e.ref, e.visible);
 	}
 
 	@debug()
@@ -792,7 +793,7 @@ export class GraphWebview extends WebviewBase<State> {
 
 		const hiddenRefs = this.getHiddenRefs();
 		return this.notify(DidChangeHiddenRefsNotificationType, {
-			hiddenRefs: hiddenRefs,
+			hiddenRefs: this.getHiddenRefsById(hiddenRefs),
 		});
 	}
 
@@ -968,6 +969,21 @@ export class GraphWebview extends WebviewBase<State> {
 		return this.container.storage.getWorkspace('graph:hiddenRefs');
 	}
 
+	private getHiddenRefsById(
+		hiddenRefs: Record<string, GraphHiddenRef> | undefined
+	): HiddenRefsById | undefined {
+		if (hiddenRefs == null) return undefined;
+
+		const hiddenRefsById: HiddenRefsById = {};
+		for (const [id, graphHiddenRef] of Object.entries(hiddenRefs)) {
+			hiddenRefsById[id] = {
+				...graphHiddenRef,
+			};
+		}
+
+		return hiddenRefsById;
+	}
+
 	private getColumnSettings(
 		columns: Record<GraphColumnName, GraphColumnConfig> | undefined,
 	): GraphColumnsSettings | undefined {
@@ -1107,6 +1123,7 @@ export class GraphWebview extends WebviewBase<State> {
 		}
 
 		const columns = this.getColumns();
+		const hiddenRefs = this.getHiddenRefs();
 
 		return {
 			previewBanner: this.previewBanner,
@@ -1132,7 +1149,7 @@ export class GraphWebview extends WebviewBase<State> {
 			context: {
 				header: this.getColumnHeaderContext(columns),
 			},
-			hiddenRefs: this.getHiddenRefs(),
+			hiddenRefs: this.getHiddenRefsById(hiddenRefs),
 			nonce: this.cspNonce,
 			workingTreeStats: getSettledValue(workingStatsResult) ?? { added: 0, deleted: 0, modified: 0 },
 		};
@@ -1145,11 +1162,11 @@ export class GraphWebview extends WebviewBase<State> {
 		void this.notifyDidChangeColumns();
 	}
 
-	private updateHiddenRef(id: string, name: string, visible: boolean) {
+	private updateHiddenRef(ref: GraphHiddenRef, visible: boolean) {
 		let hiddenRefs = this.container.storage.getWorkspace('graph:hiddenRefs');
 		hiddenRefs = visible
-			? deleteRecordValue(hiddenRefs, id)
-			: updateRecordValue(hiddenRefs, id, { name: name });
+			? deleteRecordValue(hiddenRefs, ref.id)
+			: updateRecordValue(hiddenRefs, ref.id, ref);
 		void this.container.storage.storeWorkspace('graph:hiddenRefs', hiddenRefs);
 		void this.notifyDidChangeHiddenRefs();
 	}

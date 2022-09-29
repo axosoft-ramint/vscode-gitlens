@@ -1,5 +1,5 @@
 /*global document window*/
-import type { CssVariables, GraphRef, GraphRow } from '@gitkraken/gitkraken-components';
+import type { CssVariables, GraphRow } from '@gitkraken/gitkraken-components';
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import type { GitGraphRowType } from '../../../../git/models/graph';
@@ -8,6 +8,7 @@ import type {
 	DismissBannerParams,
 	GraphColumnConfig,
 	GraphColumnName,
+	GraphHiddenRef,
 	GraphRepository,
 	InternalNotificationType,
 	State,
@@ -82,7 +83,7 @@ export class GraphApp extends App<State> {
 						250,
 					)}
                     onHiddenRefChange={debounce<GraphApp['onHiddenRefChanged'](
-						(ref: GraphRef, visible: boolean) => this.onHiddenRefChanged(ref, visible),
+						(ref: GraphHiddenRef, visible: boolean) => this.onHiddenRefChanged(ref, visible),
 						250,
 					)}
 					onSelectRepository={debounce<GraphApp['onRepositorySelectionChanged']>(
@@ -350,10 +351,9 @@ export class GraphApp extends App<State> {
 		});
 	}
 
-	private onHiddenRefChanged(ref: GraphRef, visible: boolean) {
+	private onHiddenRefChanged(ref: GraphHiddenRef, visible: boolean) {
 		this.sendCommand(UpdateHiddenRefCommandType, {
-			id: (ref as any).id,
-			name: (ref as any).name,
+			ref: ref,
 			visible: visible,
 		});
 	}
