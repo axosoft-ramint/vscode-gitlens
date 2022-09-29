@@ -483,8 +483,8 @@ export function GraphWrapper({
 		}
 	};
 
-	const handleOnHiddenRefsContextMenu = (event: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
-		console.log('*** handleOnHiddenRefsContextMenu -> ', event);
+	const handleOnHiddenRefsClick = (event: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
+		console.log('*** handleOnHiddenRefsClick -> ', event);
 
 		// TODO: discuss if we can use the VSCode context menu and if we need to include
 		// a specific context in the button of graph component side.
@@ -728,7 +728,7 @@ export function GraphWrapper({
 								isSelectedBySha={selectedRows}
 								nonce={nonce}
 								onColumnResized={handleOnColumnResized}
-								onHiddenRefsContextMenu={handleOnHiddenRefsContextMenu}
+								onHiddenRefsClick={handleOnHiddenRefsClick}
 								onSelectGraphRows={handleSelectGraphRows}
 								onToggleRefVisibilityClick={handleOnToggleRefVisibilityClick}
 								onEmailsMissingAvatarUrls={handleMissingAvatars}
