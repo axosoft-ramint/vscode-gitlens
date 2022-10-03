@@ -221,6 +221,7 @@ export interface StoredGraphColumn {
 export interface StoredGraphHiddenRef {
 	id: string;
 	name: string;
+	type: string;
 }
 
 export interface StoredNamedRef {

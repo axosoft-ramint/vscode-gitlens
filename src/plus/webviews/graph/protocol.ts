@@ -2,6 +2,7 @@ import type {
 	CssVariables,
 	GraphColumnSetting,
 	GraphContexts,
+	GraphRefOptData,
 	GraphRow,
 	GraphZoneType,
 	HiddenRefsById,
@@ -94,10 +95,7 @@ export interface GraphColumnConfig {
 	width?: number;
 }
 
-export interface GraphHiddenRef {
-	id: string;
-	name: string;
-}
+export type GraphHiddenRef = GraphRefOptData;
 
 export type GraphColumnName = GraphZoneType;
 
