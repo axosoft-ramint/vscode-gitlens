@@ -222,6 +222,7 @@ export interface StoredGraphHiddenRef {
 	id: string;
 	name: string;
 	type: string;
+	avatarUrl?: string;
 }
 
 export interface StoredNamedRef {
