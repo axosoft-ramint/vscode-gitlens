@@ -3,10 +3,8 @@ import type {
 	GraphColumnSetting,
 	GraphContainerProps,
 	GraphPlatform,
-    GraphRef,
     GraphRefOptData,
 	GraphRow,
-    HiddenRefsById,
 	OnFormatCommitDateTime,
 } from '@gitkraken/gitkraken-components';
 import type { ReactElement } from 'react';
@@ -28,12 +26,12 @@ import type {
 	GraphSearchResultsError,
 	InternalNotificationType,
 	State,
-	UpdateStateCallback,
-} from '../../../../plus/webviews/graph/protocol';
+	UpdateStateCallback} from '../../../../plus/webviews/graph/protocol';
 import {
 	DidChangeAvatarsNotificationType,
 	DidChangeColumnsNotificationType,
 	DidChangeGraphConfigurationNotificationType,
+	DidChangeHiddenRefsNotificationType,
 	DidChangeRowsNotificationType,
 	DidChangeSelectionNotificationType,
 	DidChangeSubscriptionNotificationType,
@@ -68,20 +66,6 @@ export interface GraphWrapperProps {
 	onSelectionChange?: (rows: GraphRow[]) => void;
 	onEnsureRowPromise?: (id: string, select: boolean) => Promise<DidEnsureRowParams | undefined>;
 }
-const getHiddenRefsById = (
-	hiddenRefs?: Record<string, GraphHiddenRef>
-): HiddenRefsById | undefined => {
-	if (hiddenRefs == null) return undefined;
-
-	const hiddenRefsById: HiddenRefsById = {};
-	if (hiddenRefs != null) {
-		for (const [refId] of Object.entries(hiddenRefs)) {
-			hiddenRefsById[refId] = true;
-		}
-	}
-
-	return hiddenRefsById;
-};
 
 const getGraphDateFormatter = (config?: GraphComponentConfig): OnFormatCommitDateTime => {
 	return (commitDateTime: number) => formatCommitDateTime(commitDateTime, config?.dateStyle, config?.dateFormat);
@@ -179,6 +163,7 @@ export function GraphWrapper({
 	const [graphConfig, setGraphConfig] = useState(state.config);
 	// const [graphDateFormatter, setGraphDateFormatter] = useState(getGraphDateFormatter(config));
 	const [columns, setColumns] = useState(state.columns);
+	const [hiddenRefsById, setHiddenRefsById] = useState(state.hiddenRefs);
 	const [context, setContext] = useState(state.context);
 	const [pagingHasMore, setPagingHasMore] = useState(state.paging?.hasMore ?? false);
 	const [isLoading, setIsLoading] = useState(state.loading);
@@ -251,6 +236,9 @@ export function GraphWrapper({
 			case DidChangeSelectionNotificationType:
 				setSelectedRows(state.selectedRows);
 				break;
+			case DidChangeHiddenRefsNotificationType:
+				setHiddenRefsById(state.hiddenRefs);
+				break;
 			case DidChangeSubscriptionNotificationType:
 				setIsAccessAllowed(state.allowed ?? false);
 				setSubscription(state.subscription);
@@ -268,6 +256,7 @@ export function GraphWrapper({
 				setWorkingTreeStats(state.workingTreeStats ?? { added: 0, modified: 0, deleted: 0 });
 				setGraphConfig(state.config);
 				setSelectedRows(state.selectedRows);
+				setHiddenRefsById(state.hiddenRefs);
 				setContext(state.context);
 				setAvatars(state.avatars ?? {});
 				setPagingHasMore(state.paging?.hasMore ?? false);

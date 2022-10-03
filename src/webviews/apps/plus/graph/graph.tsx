@@ -82,7 +82,7 @@ export class GraphApp extends App<State> {
 						(name, settings) => this.onColumnChanged(name, settings),
 						250,
 					)}
-                    onHiddenRefChange={debounce<GraphApp['onHiddenRefChanged'](
+                    onHiddenRefChange={debounce<GraphApp['onHiddenRefChanged']>(
 						(ref: GraphHiddenRef, visible: boolean) => this.onHiddenRefChanged(ref, visible),
 						250,
 					)}
