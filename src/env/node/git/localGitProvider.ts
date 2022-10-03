@@ -81,8 +81,7 @@ import { Repository, RepositoryChange, RepositoryChangeComparisonMode } from '..
 import type { GitStash } from '../../../git/models/stash';
 import type { GitStatusFile } from '../../../git/models/status';
 import { GitStatus } from '../../../git/models/status';
-import type { GitTag, TagSortOptions } from '../../../git/models/tag';
-import { sortTags } from '../../../git/models/tag';
+import { GitTag, sortTags, type TagSortOptions } from '../../../git/models/tag';
 import type { GitTreeEntry } from '../../../git/models/tree';
 import type { GitUser } from '../../../git/models/user';
 import { isUserMatch } from '../../../git/models/user';
@@ -1782,8 +1781,11 @@ export class LocalGitProvider implements GitProvider, Disposable {
 						if (tip === 'refs/stash') continue;
 
 						if (tip.startsWith('tag: ')) {
+							const tagName = tip.substring(5);
+							const tagId = GitTag.getId(repoPath, tagName);
 							tag = {
-								name: tip.substring(5),
+								id: tagId,
+								name: tagName,
 								// Not currently used, so don't bother looking it up
 								annotated: true,
 							};
@@ -1792,6 +1794,7 @@ export class LocalGitProvider implements GitProvider, Disposable {
 								webviewItemValue: {
 									type: 'tag',
 									ref: GitReference.create(tag.name, repoPath, {
+										id: tagId,
 										refType: 'tag',
 										name: tag.name,
 									}),
@@ -1819,23 +1822,29 @@ export class LocalGitProvider implements GitProvider, Disposable {
 								branchName = getBranchNameWithoutRemote(tip);
 								if (branchName === 'HEAD') continue;
 
+								const remoteBranchId = GitBranch.getId(repoPath, true, branchName);
+								const avatarUrl = (
+									remote.provider?.avatarUri ??
+									getRemoteIconUri(this.container, remote, asWebviewUri)
+								)?.toString(true);
+
 								refRemoteHeads.push({
+									id: remoteBranchId,
 									name: branchName,
 									owner: remote.name,
 									url: remote.url,
-									avatarUrl: (
-										remote.provider?.avatarUri ??
-										getRemoteIconUri(this.container, remote, asWebviewUri)
-									)?.toString(true),
+									avatarUrl: avatarUrl,
 									context: serializeWebviewItemContext<GraphItemRefContext>({
 										webviewItem: 'gitlens:branch+remote',
 										webviewItemValue: {
 											type: 'branch',
 											ref: GitReference.create(tip, repoPath, {
+												id: remoteBranchId,
 												refType: 'branch',
 												name: tip,
 												remote: true,
 												upstream: { name: remote.name, missing: false },
+												avatarUrl: avatarUrl,
 											}),
 										},
 									}),
@@ -1846,7 +1855,10 @@ export class LocalGitProvider implements GitProvider, Disposable {
 						}
 
 						branch = branchMap.get(tip);
+						const branchId = GitBranch.getId(repoPath, false, tip);
+
 						refHeads.push({
+							id: branchId,
 							name: tip,
 							isCurrentHead: current,
 							context: serializeWebviewItemContext<GraphItemRefContext>({
@@ -1856,6 +1868,7 @@ export class LocalGitProvider implements GitProvider, Disposable {
 								webviewItemValue: {
 									type: 'branch',
 									ref: GitReference.create(tip, repoPath, {
+										id: branchId,
 										refType: 'branch',
 										name: tip,
 										remote: false,

@@ -1148,12 +1148,14 @@ export class GitHubGitProvider implements GitProvider, Disposable {
 			if (hasHeadShaAndRemote && commit.sha === branch.sha) {
 				refHeads = [
 					{
+						id: branch.id,
 						name: branch.name,
 						isCurrentHead: true,
 					},
 				];
 				refRemoteHeads = [
 					{
+						id: branch.id,
 						name: branch.name,
 						owner: remote.name,
 						url: remote.url,
@@ -1173,6 +1175,7 @@ export class GitHubGitProvider implements GitProvider, Disposable {
 						if (t.sha !== commit.sha) return undefined;
 
 						return {
+							id: t.id,
 							name: t.name,
 							annotated: Boolean(t.message),
 						};
