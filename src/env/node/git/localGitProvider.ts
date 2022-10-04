@@ -1820,6 +1820,7 @@ export class LocalGitProvider implements GitProvider, Disposable {
 								if (branchName === 'HEAD') continue;
 
 								refRemoteHeads.push({
+									...remote.name === 'origin' && { id: 'a' },
 									name: branchName,
 									owner: remote.name,
 									url: remote.url,

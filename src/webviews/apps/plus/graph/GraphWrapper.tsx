@@ -139,6 +139,9 @@ export function GraphWrapper({
 	onSelectionChange,
 	onDismissBanner,
 }: GraphWrapperProps) {
+	const graphRefMetadata = {
+		a: { pullRequests: [ { id: 1, title: 'TEST PR', hostingServiceType: 'github' } ] },
+	};
 	// TODO: application shouldn't know about the graph component's header
 	const graphHeaderOffset = 24;
 	const [mainWidth, setMainWidth] = useState<number>();
@@ -690,6 +693,7 @@ export function GraphWrapper({
 								onEmailsMissingAvatarUrls={handleMissingAvatars}
 								onShowMoreCommits={handleMoreCommits}
 								platform={clientPlatform}
+								refMetadataById={graphRefMetadata}
 								shaLength={graphConfig?.idLength}
 								themeOpacityFactor={styleProps?.themeOpacityFactor}
 								useAuthorInitialsForAvatars={!graphConfig?.avatars}
